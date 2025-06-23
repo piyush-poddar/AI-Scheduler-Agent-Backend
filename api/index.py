@@ -5,10 +5,9 @@ from calendar_service import format_slots, find_free_slots, book_meeting
 from pydantic import BaseModel
 
 app = FastAPI()
-handler = Mangum(app)
 
 @app.get("/")
-def root():
+async def root():
     return {"message": "Google Calendar Free Slots API is running"}
 
 @app.get("/get_free_slots")
@@ -32,3 +31,5 @@ async def book_meeting_endpoint(
     end_dt = datetime.datetime.strptime(request.end_time, '%Y-%m-%d %H:%M')
     event_link = book_meeting(start_dt, end_dt, request.title)
     return {"result": "Meeting booked successfully"}
+
+handler = Mangum(app)
