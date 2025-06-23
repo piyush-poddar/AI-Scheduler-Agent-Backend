@@ -17,9 +17,9 @@ WORK_END_HOUR = 22    # 10 PM IST
 
 def get_calendar_service():
     creds = None
-    if os.path.exists('token.json'):
-        with open('token.json', 'r') as token:
-            creds = Credentials.from_authorized_user_info(json.load(token), SCOPES)
+    #if os.path.exists('token.json'):
+    with open('token.json', 'r') as token:
+        creds = Credentials.from_authorized_user_info(json.load(token), SCOPES)
 
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
