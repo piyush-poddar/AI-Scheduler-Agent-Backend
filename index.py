@@ -4,18 +4,18 @@ from calendar_service import format_slots, find_free_slots, book_meeting
 
 app = Flask(__name__)
 
-@app.route("/", methods=["GET"])
+@app.route("/api", methods=["GET"])
 def root():
     return jsonify({"message": "Google Calendar Free Slots API is running"})
 
-@app.route("/get_free_slots", methods=["GET"])
+@app.route("/api/get-free-slots", methods=["GET"])
 def get_free_slots():
     date = request.args.get("date")  # Format: 'YYYY-MM-DD'
     duration_minutes = int(request.args.get("duration_minutes", 60))
     slots = format_slots(find_free_slots(date, duration_minutes))
     return jsonify({"free_slots": slots})
 
-@app.route("/book_meeting", methods=["POST"])
+@app.route("/api/book-meeting", methods=["POST"])
 def book_meeting_endpoint():
     data = request.get_json()
     start_time = data["start_time"]  # Format: 'YYYY-MM-DD HH:MM'
