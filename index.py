@@ -26,6 +26,3 @@ def book_meeting_endpoint():
     end_dt = datetime.datetime.strptime(end_time, '%Y-%m-%d %H:%M')
     event_link = book_meeting(start_dt, end_dt, title)
     return jsonify({"result": "Meeting booked successfully", "link": event_link})
-
-if __name__ == "__main__":
-    app.run()
