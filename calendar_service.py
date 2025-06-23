@@ -107,11 +107,11 @@ def book_meeting(start_time: datetime.datetime, end_time: datetime.datetime, sum
     event = {
         'summary': summary,
         'start': {
-            'dateTime': start_time.astimezone(pytz.UTC).isoformat(),
+            'dateTime': start_time.astimezone(IST).isoformat(),
             'timeZone': 'Asia/Kolkata'
         },
         'end': {
-            'dateTime': end_time.astimezone(pytz.UTC).isoformat(),
+            'dateTime': end_time.astimezone(IST).isoformat(),
             'timeZone': 'Asia/Kolkata'
         },
         'reminders': {
