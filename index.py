@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route("/api", methods=["GET"])
 def root():
-    return jsonify({"message": "Google Calendar Free Slots API is running"})
+    return jsonify({"message": "Scheduler Agent API is running"})
 
 @app.route("/api/get-free-slots", methods=["GET"])
 def get_free_slots():
