@@ -104,14 +104,20 @@ def format_slots(slots: List[Tuple[datetime.datetime, datetime.datetime]]) -> Li
 def book_meeting(start_time: datetime.datetime, end_time: datetime.datetime, summary: str = "Meeting") -> str:
     service = get_calendar_service()
 
+    # Ensure timezone-aware in IST
+    if start_time.tzinfo is None:
+        start_time = IST.localize(start_time)
+    if end_time.tzinfo is None:
+        end_time = IST.localize(end_time)
+
     event = {
         'summary': summary,
         'start': {
-            'dateTime': start_time.astimezone(IST).isoformat(),
+            'dateTime': start_time.isoformat(),
             'timeZone': 'Asia/Kolkata'
         },
         'end': {
-            'dateTime': end_time.astimezone(IST).isoformat(),
+            'dateTime': end_time.isoformat(),
             'timeZone': 'Asia/Kolkata'
         },
         'reminders': {
