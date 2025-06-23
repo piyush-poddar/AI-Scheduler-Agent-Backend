@@ -20,6 +20,9 @@ def get_calendar_service():
     #if os.path.exists('token.json'):
     with open('token.json', 'r') as token:
         creds = Credentials.from_authorized_user_info(json.load(token), SCOPES)
+    
+    if creds and creds.expired and creds.refresh_token:
+        creds.refresh(Request())
 
     # if not creds or not creds.valid:
     #     if creds and creds.expired and creds.refresh_token:
