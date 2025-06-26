@@ -31,9 +31,12 @@ def parse_datetime():
         return None
     
     dt_native = datetime.datetime(*time_struct[:6])
-    
+
+    server_tz = datetime.datetime.now().astimezone().tzinfo
+    dt_server = server_tz.localize(dt_native) if hasattr(server_tz, 'localize') else dt_native.replace(tzinfo=server_tz)
+
     IST = timezone('Asia/Kolkata')
-    dt_ist = IST.localize(dt_native)
+    dt_ist = dt_server.astimezone(IST)
     
     return jsonify(dt_ist.isoformat())
 
