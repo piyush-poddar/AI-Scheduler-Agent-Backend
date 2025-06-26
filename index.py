@@ -23,15 +23,19 @@ def parse_datetime():
         datetime.datetime: Parsed datetime object, or None if parsing fails.
     """
     text = request.args.get("text", "")
+
     cal = parsedatetime.Calendar()
     time_struct, parse_status = cal.parse(text)
     
     if parse_status == 0:
         return None
     
-    dt = datetime.datetime(*time_struct[:6])
+    dt_native = datetime.datetime(*time_struct[:6])
     
-    return jsonify(dt.isoformat())
+    IST = timezone('Asia/Kolkata')
+    dt_ist = IST.localize(dt_native)
+    
+    return jsonify(dt_ist.isoformat())
 
 @app.route("/api/get-free-slots", methods=["GET"])
 def get_free_slots():
