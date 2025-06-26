@@ -36,7 +36,7 @@ def parse_datetime():
     dt_server = server_tz.localize(dt_native) if hasattr(server_tz, 'localize') else dt_native.replace(tzinfo=server_tz)
 
     IST = timezone('Asia/Kolkata')
-    dt_ist = dt_server.astimezone(IST)
+    dt_ist = dt_server.astimezone(IST).replace(tzinfo=None)
     
     return jsonify(dt_ist.isoformat())
 
