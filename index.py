@@ -23,27 +23,19 @@ def parse_datetime():
         datetime.datetime: Parsed datetime object, or None if parsing fails.
     """
     text = request.args.get("text", "")
+    IST = timezone('Asia/Kolkata')
+    now_ist = datetime.datetime.now(IST)
 
     cal = parsedatetime.Calendar()
-    time_struct, parse_status = cal.parse(text)
-    
+    time_struct, parse_status = cal.parse(text, now_ist.timetuple())
+
     if parse_status == 0:
         return None
-    
-    dt_native = datetime.datetime(*time_struct[:6])
 
-    server_tz = datetime.datetime.now().astimezone().tzinfo
-    dt_server = server_tz.localize(dt_native) if hasattr(server_tz, 'localize') else dt_native.replace(tzinfo=server_tz)
+    dt_naive = datetime.datetime(*time_struct[:6])
+    dt_ist = IST.localize(dt_naive)
 
-    IST = timezone('Asia/Kolkata')
-    dt_ist = dt_server.astimezone(IST).replace(tzinfo=None)
-    
-    return jsonify({
-        "dt_native": dt_native.isoformat(),
-        "server_tz": str(server_tz),
-        "dt_server": dt_server.isoformat(),
-        "dt_ist": dt_ist.isoformat()
-    })
+    return jsonify(dt_ist.isoformat())
 
 @app.route("/api/get-free-slots", methods=["GET"])
 def get_free_slots():
