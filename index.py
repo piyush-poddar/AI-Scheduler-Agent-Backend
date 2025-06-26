@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 import datetime
+import parsedatetime
+from pytz import timezone
 from calendar_service import format_slots, find_free_slots, book_meeting
 
 app = Flask(__name__)
@@ -7,6 +9,29 @@ app = Flask(__name__)
 @app.route("/api", methods=["GET"])
 def root():
     return jsonify({"message": "Scheduler Agent API is running"})
+
+@app.route("/api/parse-datetime", methods=["GET"])
+def parse_datetime():
+    """
+    Parse a natural language date/time string into a datetime object.
+    Use this tool to interpret user input like "today", "next Tuesday" or "in 2 hours".
+
+    Args:
+        text (str): Natural language date/time string.
+
+    Returns:
+        datetime.datetime: Parsed datetime object, or None if parsing fails.
+    """
+    text = request.args.get("text", "")
+    cal = parsedatetime.Calendar()
+    time_struct, parse_status = cal.parse(text)
+    
+    if parse_status == 0:
+        return None
+    
+    dt = datetime.datetime(*time_struct[:6])
+    
+    return jsonify(dt.isoformat())
 
 @app.route("/api/get-free-slots", methods=["GET"])
 def get_free_slots():
@@ -26,3 +51,6 @@ def book_meeting_endpoint():
     end_dt = datetime.datetime.strptime(end_time, '%Y-%m-%d %H:%M')
     event_link = book_meeting(start_dt, end_dt, title)
     return jsonify({"result": "Meeting booked successfully", "link": event_link})
+
+# if __name__ == "__main__":
+#     app.run(debug=True)
