@@ -23,7 +23,7 @@ def parse_datetime():
         datetime.datetime: Parsed datetime object, or None if parsing fails.
     """
     text = request.args.get("text", "")
-    
+
     IST = timezone('Asia/Kolkata')
     now_ist = datetime.datetime.now(IST)
 
@@ -35,7 +35,7 @@ def parse_datetime():
 
     dt_ist = datetime.datetime(*time_struct[:6])
 
-    return jsonify(dt_ist.isoformat())
+    return jsonify(dt_ist.strftime('%Y-%m-%d'))
 
 @app.route("/api/get-free-slots", methods=["GET"])
 def get_free_slots():
