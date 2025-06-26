@@ -38,7 +38,12 @@ def parse_datetime():
     IST = timezone('Asia/Kolkata')
     dt_ist = dt_server.astimezone(IST).replace(tzinfo=None)
     
-    return jsonify(dt_ist.isoformat())
+    return jsonify({
+        "dt_native": dt_native.isoformat(),
+        "server_tz": str(server_tz),
+        "dt_server": dt_server.isoformat(),
+        "dt_ist": dt_ist.isoformat()
+    })
 
 @app.route("/api/get-free-slots", methods=["GET"])
 def get_free_slots():
