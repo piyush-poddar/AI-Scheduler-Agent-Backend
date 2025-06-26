@@ -23,6 +23,7 @@ def parse_datetime():
         datetime.datetime: Parsed datetime object, or None if parsing fails.
     """
     text = request.args.get("text", "")
+    
     IST = timezone('Asia/Kolkata')
     now_ist = datetime.datetime.now(IST)
 
@@ -32,8 +33,7 @@ def parse_datetime():
     if parse_status == 0:
         return None
 
-    dt_naive = datetime.datetime(*time_struct[:6])
-    dt_ist = IST.localize(dt_naive)
+    dt_ist = datetime.datetime(*time_struct[:6])
 
     return jsonify(dt_ist.isoformat())
 
