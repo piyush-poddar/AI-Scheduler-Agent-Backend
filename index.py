@@ -35,7 +35,9 @@ def parse_datetime():
 
     dt_ist = datetime.datetime(*time_struct[:6])
 
-    return jsonify(dt_ist.strftime('%Y-%m-%d'))
+    return jsonify({
+        "date": dt_ist.strftime('%Y-%m-%d'),
+    })
 
 @app.route("/api/get-free-slots", methods=["GET"])
 def get_free_slots():
