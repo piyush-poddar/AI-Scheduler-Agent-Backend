@@ -101,7 +101,12 @@ def find_free_slots(date: str, duration_minutes: int = 60) -> List[Tuple[datetim
 def format_slots(slots: List[Tuple[datetime.datetime, datetime.datetime]]) -> List[str]:
     return [f"{start.strftime('%I:%M %p')} - {end.strftime('%I:%M %p')}" for start, end in slots]
 
-def book_meeting(start_time: datetime.datetime, end_time: datetime.datetime, summary: str = "Meeting") -> str:
+def book_meeting(
+    start_time: datetime.datetime,
+    end_time: datetime.datetime,
+    summary: str = "Meeting",
+    description: str = ""
+) -> str:
     service = get_calendar_service()
 
     # Ensure timezone-aware in IST
@@ -120,6 +125,7 @@ def book_meeting(start_time: datetime.datetime, end_time: datetime.datetime, sum
             'dateTime': end_time.isoformat(),
             'timeZone': 'Asia/Kolkata'
         },
+        'description': description,
         'reminders': {
             'useDefault': True,
         }
