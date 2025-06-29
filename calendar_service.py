@@ -8,6 +8,7 @@ import pickle
 import json
 from google.oauth2.credentials import Credentials
 import pytz
+import base64
 
 # Constants
 SCOPES = ['https://www.googleapis.com/auth/calendar']
@@ -106,7 +107,7 @@ def book_meeting(
     end_time: datetime.datetime,
     summary: str = "Meeting",
     description: str = ""
-) -> str:
+) -> tuple[str, str]:
     service = get_calendar_service()
 
     # Ensure timezone-aware in IST
@@ -132,12 +133,48 @@ def book_meeting(
     }
 
     created_event = service.events().insert(calendarId='primary', body=event).execute()
-    return created_event.get('htmlLink', '')
+    
+    return created_event.get('htmlLink', ''), created_event.get('id', '')
 
+def update_meeting(
+    event_id: str,
+    start_time: datetime.datetime,
+    end_time: datetime.datetime,
+    summary: str = "Updated Meeting",
+    description: str = ""
+) -> tuple[str, str]:
+    service = get_calendar_service()
+
+    # Ensure timezone-aware in IST
+    if start_time.tzinfo is None:
+        start_time = IST.localize(start_time)
+    if end_time.tzinfo is None:
+        end_time = IST.localize(end_time)
+
+    event = {
+        'summary': summary,
+        'start': {
+            'dateTime': start_time.isoformat(),
+            'timeZone': 'Asia/Kolkata'
+        },
+        'end': {
+            'dateTime': end_time.isoformat(),
+            'timeZone': 'Asia/Kolkata'
+        },
+        'description': description,
+        'reminders': {
+            'useDefault': True,
+        }
+    }
+
+    updated_event = service.events().update(calendarId='primary', eventId=event_id, body=event).execute()
+    
+    # Return the link and event_id to the updated event
+    return updated_event.get('htmlLink', ''), updated_event.get('id', '')
 
 if __name__ == "__main__":
     # Example usage
-    date = "2025-06-14"
+    date = "2025-06-11"
     duration = 60  # minutes
 
     free_slots = find_free_slots(date, duration)
@@ -154,5 +191,17 @@ if __name__ == "__main__":
         end_time = start_time + datetime.timedelta(minutes=duration)
         #event_link = book_meeting(start_time, end_time, "Test Meeting")
         #print(f"Meeting booked successfully! Event link: {event_link}")
+        # Just a sample, not a real event ID
+        eid = "MzEzNDdicDlvYmkycGVibmZrNzQwOHA0NmMgcGl5dXNocG9kZGFyMjY4MjRAbQ"
+        decoded = base64.urlsafe_b64decode(eid + '===').decode()
+        event_id, _ = decoded.split(' ')
+        event_link = update_meeting(
+            event_id=event_id,  # Replace with your actual event ID
+            start_time=start_time,
+            end_time=end_time,
+            summary="Updated Test Meeting",
+            description="This is an updated test meeting."
+        )
+        print(event_link)
     else:
         print("No slots available to book a meeting.")

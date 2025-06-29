@@ -4,6 +4,7 @@ import json
 import parsedatetime
 from pytz import timezone
 from calendar_service import format_slots, find_free_slots, book_meeting
+from db import insert_user, get_user_by_phone
 
 app = Flask(__name__)
 
@@ -20,12 +21,9 @@ def check_user():
     if not phone:
         return jsonify({"exists": 0, "message": "Phone number is required"})
     
-    with open("users.json", "r") as f:
-        users = json.load(f)
-    
-    for phone_number in users:
-        if phone_number == phone:
-            return jsonify({"exists": 1, "data": users[phone_number]})
+    user = get_user_by_phone(phone)
+    if user:
+        return jsonify({"exists": 1, "data": user})
     
     return jsonify({"exists": 0, "data": {}})
 
