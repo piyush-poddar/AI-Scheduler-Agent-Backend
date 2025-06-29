@@ -18,16 +18,16 @@ def check_user():
     """
     phone = request.args.get("phone", "")
     if not phone:
-        return jsonify({"exists": False, "message": "Phone number is required"})
+        return jsonify({"exists": 0, "message": "Phone number is required"})
     
     with open("users.json", "r") as f:
         users = json.load(f)
     
     for phone_number in users:
         if phone_number == phone:
-            return jsonify({"exists": True, "message": "User already exists"})
+            return jsonify({"exists": 1, "message": "User already exists"})
     
-    return jsonify({"exists": False, "message": "User does not exist"})
+    return jsonify({"exists": 0, "message": "User does not exist"})
 
 @app.route("/api/parse-datetime", methods=["GET"])
 def parse_datetime():
