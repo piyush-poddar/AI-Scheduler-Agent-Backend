@@ -11,11 +11,12 @@ def insert_user(
     phone: str,
     first_name: str,
     last_name: str
-):
+) -> int:
     """
     Insert a new user into the database.
     """
     try:
+        # Insert a new user and return the user ID
         with psycopg.connect(POSTGRES_URI) as conn:
             with conn.cursor() as cur:
                 cur.execute(
@@ -23,8 +24,15 @@ def insert_user(
                     (phone, first_name, last_name)
                 )
                 conn.commit()
+                
+                # Get the ID of the newly inserted user
+                cur.execute("SELECT id FROM users WHERE phone = %s", (phone,))
+                user_id = cur.fetchone()[0]
+                return user_id
+            
     except Exception as e:
         print(f"Error inserting user: {e}")
+        return None
 
 def get_user_by_phone(phone: str):
     """

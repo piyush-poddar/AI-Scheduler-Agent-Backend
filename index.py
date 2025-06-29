@@ -40,9 +40,9 @@ def add_user():
     if not any([phone, first_name, last_name]):
         return jsonify({"success": 0, "message": "Phone number and name are required"})
 
-    insert_user(phone, first_name, last_name)
+    user_id = insert_user(phone, first_name, last_name)
 
-    return jsonify({"success": 1, "message": "User added successfully"})
+    return jsonify({"success": 1, "user_id": user_id, "message": "User added successfully"})
 
 @app.route("/api/parse-datetime", methods=["GET"])
 def parse_datetime():
