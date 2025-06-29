@@ -11,10 +11,10 @@ app = Flask(__name__)
 def root():
     return jsonify({"message": "Scheduler Agent API is running"})
 
-@app.route("/api/user/exists", methods=["GET"])
+@app.route("/api/user/get", methods=["GET"])
 def check_user():
     """
-    Check if the user already exists in the system.
+    Get user details by phone number if it exists.
     """
     phone = request.args.get("phone", "")
     if not phone:
@@ -25,9 +25,9 @@ def check_user():
     
     for phone_number in users:
         if phone_number == phone:
-            return jsonify({"exists": 1, "message": "User already exists"})
+            return jsonify({"exists": 1, "data": users[phone_number]})
     
-    return jsonify({"exists": 0, "message": "User does not exist"})
+    return jsonify({"exists": 0, "data": {}})
 
 @app.route("/api/parse-datetime", methods=["GET"])
 def parse_datetime():
