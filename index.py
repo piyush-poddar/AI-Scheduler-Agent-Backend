@@ -4,7 +4,7 @@ import json
 import parsedatetime
 from pytz import timezone
 from calendar_service import format_slots, find_free_slots, book_meeting
-from db import insert_user, get_user_by_phone, insert_appointment
+from db import insert_user, get_user_by_phone, insert_appointment, get_appointment, update_appointment
 
 app = Flask(__name__)
 
@@ -103,7 +103,42 @@ def book_meeting_endpoint():
     # Insert the appointment into the database
     insert_appointment(user_id, start_dt.strftime('%Y-%m-%d'), start_dt.strftime('%H:%M'), event_id, description)
     
-    return jsonify({"result": "Appointment booked successfully", "link": event_link})
+    return jsonify({"success": 1, "result": "Appointment booked successfully", "event_id": event_id})
+
+@app.route("/api/appointment/get", methods=["GET"])
+def get_appointment_details(
+    user_id: int,
+    date: str,
+    start_time: str
+):
+    """
+    Get appointment details for a user on a specific date and time.
+    """
+    appointment = get_appointment(user_id, date, start_time)
+    
+    if not appointment:
+        return jsonify({"success": 0, "message": "No appointment found"}), 404
+    
+    return jsonify({"success": 1, "data": appointment})
+
+@app.route("/api/appointment/update", methods=["PUT"])
+def update_appointment_endpoint():
+    """
+    Update an existing appointment for a user using appointment_id.
+    """
+    data = request.get_json()
+    appointment_id = data.get("appointment_id")
+    date = data.get("date")
+    start_time = data.get("start_time")
+    description = data.get("description", "")
+    event_id = data.get("event_id", "")
+
+    if not any([appointment_id, date, start_time, description, event_id]):
+        return jsonify({"success": 0, "message": "Appointment ID, date, and start time are required"}), 400
+
+    update_appointment(appointment_id, date, start_time, description, event_id)
+    
+    return jsonify({"success": 1, "message": "Appointment updated successfully"})
 
 # if __name__ == "__main__":
 #     app.run(debug=True)

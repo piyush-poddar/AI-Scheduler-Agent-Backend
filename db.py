@@ -77,5 +77,58 @@ def insert_appointment(
     except Exception as e:
         print(f"Error inserting appointment: {e}")
 
+def get_appointment(
+    user_id: int,
+    date: str,
+    start_time: str
+):
+    """
+    Get appointments for a user on a specific date and time.
+    """
+    try:
+        with psycopg.connect(POSTGRES_URI) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT * FROM appointments WHERE user_id = %s AND date = %s AND start_time = %s",
+                    (user_id, date, start_time)
+                )
+                appointment = cur.fetchone()
+                if appointment:
+                    return {
+                        "appointment_id": appointment[0],
+                        "user_id": appointment[1],
+                        "date": appointment[2],
+                        "start_time": appointment[3],
+                        "description": appointment[4],
+                        "event_id": appointment[5]
+                    }
+                else:
+                    return None
+    except Exception as e:
+        print(f"Error fetching appointment: {e}")
+        return None
+
+def update_appointment(
+    appointment_id: int,
+    date: str,
+    start_time: str,
+    description: str,
+    event_id: str
+):
+    """
+    Update an existing appointment.
+    """
+    try:
+        with psycopg.connect(POSTGRES_URI) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE appointments SET date = %s, start_time = %s, description = %s, event_id = %s WHERE id = %s",
+                    (date, start_time, description, event_id, appointment_id)
+                )
+                conn.commit()
+    except Exception as e:
+        print(f"Error updating appointment: {e}")
+
+
 # user = get_user_by_phone("9560779666")
 # print(user)
