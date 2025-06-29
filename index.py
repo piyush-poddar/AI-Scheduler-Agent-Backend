@@ -4,7 +4,7 @@ import json
 import parsedatetime
 from pytz import timezone
 from calendar_service import format_slots, find_free_slots, book_meeting
-from db import insert_user, get_user_by_phone
+from db import insert_user, get_user_by_phone, insert_appointment
 
 app = Flask(__name__)
 
@@ -34,26 +34,13 @@ def add_user():
     """
     data = request.get_json()
     phone = data.get("phone", "")
-    firstName = data.get("firstName", "")
-    lastName = data.get("lastName", "")
+    first_name = data.get("first_name", "")
+    last_name = data.get("last_name", "")
 
-    if not any([phone, firstName, lastName]):
+    if not any([phone, first_name, last_name]):
         return jsonify({"success": 0, "message": "Phone number and name are required"})
 
-    with open("users.json", "r") as f:
-        users = json.load(f)
-
-    if phone in users:
-        return jsonify({"success": 0, "message": "User already exists"})
-
-    users[phone] = {
-        "firstName": firstName,
-        "lastName": lastName,
-        "appointments": []
-    }
-    
-    with open("users.json", "w") as f:
-        json.dump(users, f)
+    insert_user(phone, first_name, last_name)
 
     return jsonify({"success": 1, "message": "User added successfully"})
 
@@ -91,39 +78,30 @@ def get_free_slots():
     date = request.args.get("date")  # Format: 'YYYY-MM-DD'
     duration_minutes = int(request.args.get("duration_minutes", 60))
     slots = format_slots(find_free_slots(date, duration_minutes))
+    
     return jsonify({"free_slots": slots})
 
 @app.route("/api/book-meeting", methods=["POST"])
 def book_meeting_endpoint():
     data = request.get_json()
-    phone = data.get("phone", "")
+    user_id = data.get("user_id", "")
     start_time = data["start_time"]  # Format: 'YYYY-MM-DD HH:MM'
-    end_time = data["end_time"]      # Format: 'YYYY-MM-DD HH:MM'
+    end_time = start_time + datetime.timedelta(minutes=60)     # Format: 'YYYY-MM-DD HH:MM'
     title = data.get("title", "Appointment")
-    description = data.get("description", "")
+    description = data.get("description", "Consultation Appointment")
 
     # Schedule the appointment
     start_dt = datetime.datetime.strptime(start_time, '%Y-%m-%d %H:%M')
     end_dt = datetime.datetime.strptime(end_time, '%Y-%m-%d %H:%M')
-    event_link = book_meeting(start_dt, end_dt, title, description)
-
-    # Save the appointment to the user's record
-    with open("users.json", "r") as f:
-        users = json.load(f)
+    event_link, event_id = book_meeting(start_dt, end_dt, title, description)
     
-    if phone not in users:
-        return jsonify({"result": "User not found"}), 404
+    if not event_link:
+        return jsonify({"error": "Failed to book the meeting"}), 500
+    if not user_id:
+        return jsonify({"error": "User ID is required"}), 400
     
-    users[phone]["appointments"].append({
-        "start_time": start_dt.strftime('%Y-%m-%d %H:%M'),
-        "end_time": end_dt.strftime('%Y-%m-%d %H:%M'),
-        "title": title,
-        "description": description,
-        "event_link": event_link
-    })
-
-    with open("users.json", "w") as f:
-        json.dump(users, f)
+    # Insert the appointment into the database
+    insert_appointment(user_id, start_dt.strftime('%Y-%m-%d'), start_dt.strftime('%H:%M'), event_id, description)
     
     return jsonify({"result": "Appointment booked successfully", "link": event_link})
 
