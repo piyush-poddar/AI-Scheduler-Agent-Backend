@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import datetime
+import json
 import parsedatetime
 from pytz import timezone
 from calendar_service import format_slots, find_free_slots, book_meeting
@@ -9,6 +10,24 @@ app = Flask(__name__)
 @app.route("/api", methods=["GET"])
 def root():
     return jsonify({"message": "Scheduler Agent API is running"})
+
+@app.route("/api/user/exists", methods=["GET"])
+def check_user():
+    """
+    Check if the user already exists in the system.
+    """
+    phone = request.args.get("phone", "")
+    if not phone:
+        return jsonify({"exists": False, "message": "Phone number is required"})
+    
+    with open("users.json", "r") as f:
+        users = json.load(f)
+    
+    for phone_number in users:
+        if phone_number == phone:
+            return jsonify({"exists": True, "message": "User already exists"})
+    
+    return jsonify({"exists": False, "message": "User does not exist"})
 
 @app.route("/api/parse-datetime", methods=["GET"])
 def parse_datetime():
