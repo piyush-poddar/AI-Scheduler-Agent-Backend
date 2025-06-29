@@ -85,14 +85,14 @@ def get_free_slots():
 def book_meeting_endpoint():
     data = request.get_json()
     user_id = data.get("user_id", "")
-    start_time = data["start_time"]  # Format: 'YYYY-MM-DD HH:MM'
-    end_time = start_time + datetime.timedelta(minutes=60)     # Format: 'YYYY-MM-DD HH:MM'
+    start_time = data["start_time"]  # Format: 'YYYY-MM-DD HH:MM'    
     title = data.get("title", "Appointment")
     description = data.get("description", "Consultation Appointment")
 
     # Schedule the appointment
     start_dt = datetime.datetime.strptime(start_time, '%Y-%m-%d %H:%M')
-    end_dt = datetime.datetime.strptime(end_time, '%Y-%m-%d %H:%M')
+    # Add 60 minutes to the start time for the end time
+    end_dt = start_dt + datetime.timedelta(minutes=60)
     event_link, event_id = book_meeting(start_dt, end_dt, title, description)
     
     if not event_link:
