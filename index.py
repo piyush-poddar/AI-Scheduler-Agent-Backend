@@ -120,7 +120,7 @@ def get_appointment_details():
     
     return jsonify({"success": 1, "data": appointment})
 
-@app.route("/api/appointment/update", methods=["PUT"])
+@app.route("/api/appointment/update", methods=["POST"])
 def update_appointment_endpoint():
     """
     Update an existing appointment for a user using appointment_id.
