@@ -101,9 +101,9 @@ def book_meeting_endpoint():
         return jsonify({"error": "User ID is required"}), 400
     
     # Insert the appointment into the database
-    insert_appointment(user_id, start_dt.strftime('%Y-%m-%d'), start_dt.strftime('%H:%M'), event_id, description)
+    appointment_id = insert_appointment(user_id, start_dt.strftime('%Y-%m-%d'), start_dt.strftime('%H:%M'), event_id, description)
     
-    return jsonify({"success": 1, "result": "Appointment booked successfully", "event_id": event_id})
+    return jsonify({"success": 1, "result": "Appointment booked successfully", "event_id": event_id, "appointment_id": appointment_id})
 
 @app.route("/api/appointment/get", methods=["GET"])
 def get_appointment_details():
@@ -142,7 +142,7 @@ def update_appointment_endpoint():
     updated_event_link, updated_event_id = update_meeting(event_id, start_dt, end_dt, title, description=description)
 
     # Update the appointment in the database
-    update_appointment(appointment_id, start_dt.strftime('%Y-%m-%d'), start_dt.strftime('%H:%M'), description, updated_event_id)
+    update_appointment(int(appointment_id), start_dt.strftime('%Y-%m-%d'), start_dt.strftime('%H:%M'), description, updated_event_id)
     
     return jsonify({"success": 1, "event_id": updated_event_id, "message": "Appointment updated successfully"})
 

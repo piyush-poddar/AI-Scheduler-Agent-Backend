@@ -74,6 +74,11 @@ def insert_appointment(
                     (user_id, date, start_time, description, event_id)
                 )
                 conn.commit()
+                # Get appointment ID of the newly inserted appointment
+                cur.execute("SELECT id FROM appointments WHERE user_id = %s AND date = %s AND start_time = %s",
+                            (user_id, date, start_time))
+                appointment_id = cur.fetchone()[0]
+                return appointment_id
     except Exception as e:
         print(f"Error inserting appointment: {e}")
 
