@@ -106,15 +106,14 @@ def book_meeting_endpoint():
     return jsonify({"success": 1, "result": "Appointment booked successfully", "event_id": event_id})
 
 @app.route("/api/appointment/get", methods=["GET"])
-def get_appointment_details(
-    user_id: int,
-    date: str,
-    start_time: str
-):
+def get_appointment_details():
     """
     Get appointment details for a user on a specific date and time.
     """
-    appointment = get_appointment(user_id, date, start_time)
+    user_id = request.args.get("user_id", "")
+    date = request.args.get("date", "")  # Format: 'YYYY-MM-DD'
+    start_time = request.args.get("start_time", "")  # Format: 'HH:MM'
+    appointment = get_appointment(int(user_id), date, start_time)
     
     if not appointment:
         return jsonify({"success": 0, "message": "No appointment found"}), 404
