@@ -127,13 +127,12 @@ def update_appointment_endpoint():
     """
     data = request.get_json()
     appointment_id = data.get("appointment_id")
-    date = data.get("date")
     start_time = data.get("start_time")
     title = data.get("title", "Updated Appointment")
     description = data.get("description", "")
     event_id = data.get("event_id", "")
 
-    if not any([appointment_id, date, start_time, description, event_id]):
+    if not any([appointment_id, start_time, description, event_id]):
         return jsonify({"success": 0, "message": "Appointment ID, date, and start time are required"}), 400
 
     # Update the meeting in the calendar service
@@ -143,7 +142,7 @@ def update_appointment_endpoint():
     updated_event_link, updated_event_id = update_meeting(event_id, start_dt, end_dt, title, description=description)
 
     # Update the appointment in the database
-    update_appointment(appointment_id, date, start_time, description, updated_event_id)
+    update_appointment(appointment_id, start_dt.strftime('%Y-%m-%d'), start_dt.strftime('%H:%M'), description, updated_event_id)
     
     return jsonify({"success": 1, "event_id": updated_event_id, "message": "Appointment updated successfully"})
 
