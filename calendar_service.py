@@ -192,7 +192,7 @@ if __name__ == "__main__":
         #event_link = book_meeting(start_time, end_time, "Test Meeting")
         #print(f"Meeting booked successfully! Event link: {event_link}")
         # Just a sample, not a real event ID
-        eid = "MzEzNDdicDlvYmkycGVibmZrNzQwOHA0NmMgcGl5dXNocG9kZGFyMjY4MjRAbQ"
+        eid = "ajM5cmwyMTFiZzE5MmpmOWYxcGZqZzYwdWsgcGl5dXNocG9kZGFyMjY4MjRAbQ"
         decoded = base64.urlsafe_b64decode(eid + '===').decode()
         event_id, _ = decoded.split(' ')
         event_link = update_meeting(
@@ -200,7 +200,7 @@ if __name__ == "__main__":
             start_time=start_time,
             end_time=end_time,
             summary="Updated Test Meeting",
-            description="This is an updated test meeting."
+            description="Updated test meeting."
         )
         print(event_link)
     else:

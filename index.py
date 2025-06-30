@@ -3,7 +3,7 @@ import datetime
 import json
 import parsedatetime
 from pytz import timezone
-from calendar_service import format_slots, find_free_slots, book_meeting
+from calendar_service import format_slots, find_free_slots, book_meeting, update_meeting
 from db import insert_user, get_user_by_phone, insert_appointment, get_appointment, update_appointment
 
 app = Flask(__name__)
@@ -129,15 +129,23 @@ def update_appointment_endpoint():
     appointment_id = data.get("appointment_id")
     date = data.get("date")
     start_time = data.get("start_time")
+    title = data.get("title", "Updated Appointment")
     description = data.get("description", "")
     event_id = data.get("event_id", "")
 
     if not any([appointment_id, date, start_time, description, event_id]):
         return jsonify({"success": 0, "message": "Appointment ID, date, and start time are required"}), 400
 
-    update_appointment(appointment_id, date, start_time, description, event_id)
+    # Update the meeting in the calendar service
+    start_dt = datetime.datetime.strptime(start_time, '%Y-%m-%d %H:%M')
+    # Add 60 minutes to the start time for the end time
+    end_dt = start_dt + datetime.timedelta(minutes=60)
+    updated_event_link, updated_event_id = update_meeting(event_id, start_dt, end_dt, title, description=description)
+
+    # Update the appointment in the database
+    update_appointment(appointment_id, date, start_time, description, updated_event_id)
     
-    return jsonify({"success": 1, "message": "Appointment updated successfully"})
+    return jsonify({"success": 1, "event_id": updated_event_id, "message": "Appointment updated successfully"})
 
 # if __name__ == "__main__":
 #     app.run(debug=True)

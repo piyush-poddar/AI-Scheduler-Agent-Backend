@@ -95,7 +95,7 @@ def get_appointment(
                 appointment = cur.fetchone()
                 if appointment:
                     return {
-                        "appointment_id": appointment[0],
+                        "id": appointment[0],
                         "user_id": appointment[1],
                         "date": appointment[2],
                         "start_time": appointment[3],
