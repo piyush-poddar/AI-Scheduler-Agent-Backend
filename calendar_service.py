@@ -172,6 +172,15 @@ def update_meeting(
     # Return the link and event_id to the updated event
     return updated_event.get('htmlLink', ''), updated_event.get('id', '')
 
+def delete_meeting(event_id: str) -> bool:
+    service = get_calendar_service()
+    try:
+        service.events().delete(calendarId='primary', eventId=event_id).execute()
+        return True
+    except Exception as e:
+        print(f"Error deleting event: {e}")
+        return False
+
 if __name__ == "__main__":
     # Example usage
     date = "2025-06-11"

@@ -3,8 +3,8 @@ import datetime
 import json
 import parsedatetime
 from pytz import timezone
-from calendar_service import format_slots, find_free_slots, book_meeting, update_meeting
-from db import insert_user, get_user_by_phone, insert_appointment, get_appointment, update_appointment
+from calendar_service import format_slots, find_free_slots, book_meeting, update_meeting, delete_meeting
+from db import insert_user, get_user_by_phone, insert_appointment, get_appointment, update_appointment, delete_appointment
 
 app = Flask(__name__)
 
@@ -145,6 +145,27 @@ def update_appointment_endpoint():
     update_appointment(int(appointment_id), start_dt.strftime('%Y-%m-%d'), start_dt.strftime('%H:%M'), description, updated_event_id)
     
     return jsonify({"success": 1, "event_id": updated_event_id, "message": "Appointment updated successfully"})
+
+@app.route("/api/appointment/delete", methods=["POST"])
+def delete_appointment_endpoint():
+    """
+    Delete an appointment.
+    """
+    data = request.get_json()
+    appointment_id = data.get("appointment_id", "")
+    event_id = data.get("event_id", "")
+    
+    if not appointment_id:
+        return jsonify({"success": 0, "message": "Appointment ID is required"}), 400
+    
+    # Delete the meeting from the calendar service
+    if not delete_meeting(event_id):
+        return jsonify({"success": 0, "message": "Failed to delete meeting from google calendar"}), 500
+    
+    # Delete the appointment from the database
+    delete_appointment(int(appointment_id))
+    
+    return jsonify({"success": 1, "message": "Appointment deleted successfully"})
 
 # if __name__ == "__main__":
 #     app.run(debug=True)

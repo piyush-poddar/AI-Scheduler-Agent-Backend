@@ -134,6 +134,17 @@ def update_appointment(
     except Exception as e:
         print(f"Error updating appointment: {e}")
 
+def delete_appointment(appointment_id: int):
+    """
+    Delete an appointment by ID.
+    """
+    try:
+        with psycopg.connect(POSTGRES_URI) as conn:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM appointments WHERE id = %s", (appointment_id,))
+                conn.commit()
+    except Exception as e:
+        print(f"Error deleting appointment: {e}")
 
 # user = get_user_by_phone("9560779666")
 # print(user)
